@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="google49fbb733ff0cf9f4">
+  <title>Inbox &bull; Corporate Law Group Webmail</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png">
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="gmail.css">
+  <!-- Supabase JS Client via official CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- ========================================================================
+       1. Application Header (Rebranded Project Inbox with Gmail Layout)
+       ======================================================================== -->
+  <header class="gmail-header">
+    <div class="header-left">
+      <!-- Project Rebranded Logo -->
+      <a href="../" class="project-logo" title="Back to Corporate Law Group Homepage">
+        <div class="project-monogram">CLG</div>
+        <div class="project-brand-info">
+          <span class="project-brand-title">Corporate Law Group</span>
+          <span class="project-brand-sub">Client Communications &bull; /email</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Central Search Bar -->
+    <div class="header-search-wrap">
+      <div class="search-bar">
+        <button class="search-action-btn" title="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <input type="text" id="searchInput" placeholder="Search emails, clients, or legal matters..." autocomplete="off" spellcheck="false">
+        <button class="search-action-btn" id="clearSearchBtn" title="Clear search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <button class="search-action-btn" title="Filter options">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Header Right Utilities -->
+    <div class="header-right">
+      <!-- Active Sender Identity Pill -->
+      <div class="identity-badge" id="identityBadge" title="Active Sender Profile: click to configure in Settings">
+        <span class="identity-name" id="headerSenderName">Corporate Law Group Inquiries</span>
+        <span class="identity-email" id="headerSenderEmail">&lt;inquiries@mail.corporatelawgroup.org&gt;</span>
+      </div>
+
+      <!-- Live DB Connection Indicator -->
+      <div class="status-badge" id="statusBadge" title="Click to configure Supabase & Resend">
+        <span class="status-dot offline" id="statusDot"></span>
+        <span id="statusText">Configure Supabase &amp; Resend</span>
+      </div>
+
+      <button class="icon-btn" id="settingsGearBtn" title="Settings (Supabase &amp; Resend.dev)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+
+      <!-- Rebranded Firm Avatar -->
+      <div class="avatar-circle" id="headerAvatar" title="Active Account">CLG</div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       2. Application Container (Sidebar + Email Canvas + Right Dock)
+       ======================================================================== -->
+  <div class="app-container">
+
+    <!-- Left Navigation Drawer -->
+    <aside class="gmail-sidebar">
+      <!-- Compose Pill Button -->
+      <div class="compose-btn-wrap">
+        <button class="compose-btn" id="openComposeBtn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          <span>Compose</span>
+        </button>
+      </div>
+
+      <!-- Navigation Folders (Default to Inbox) -->
+      <ul class="nav-folder-list">
+        <!-- Inbox (Active) -->
+        <li class="nav-folder-item active" data-folder="inbox">
+          <div class="nav-item-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+            </svg>
+            <span>Inbox</span>
+          </div>
+          <span class="folder-count-badge" id="inboxCountBadge"></span>
+        </li>
+
+        <!-- Starred -->
+        <li class="nav-folder-item" data-folder="starred">
+          <div class="nav-item-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>Starred</span>
+          </div>
+        </li>
+
+        <!-- Sent -->
+        <li class="nav-folder-item" data-folder="sent">
+          <div class="nav-item-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            <span>Sent</span>
+          </div>
+          <span class="folder-count-badge" id="sentCountBadge"></span>
+        </li>
+
+        <!-- Drafts -->
+        <li class="nav-folder-item" data-folder="drafts">
+          <div class="nav-item-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Drafts</span>
+          </div>
+          <span class="folder-count-badge" id="draftsCountBadge"></span>
+        </li>
+
+        <!-- Trash -->
+        <li class="nav-folder-item" data-folder="trash">
+          <div class="nav-item-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Trash</span>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Project Specific Labels Section -->
+      <div class="labels-header">
+        <span>Labels</span>
+        <button class="icon-btn" style="width: 28px; height: 28px;" id="newLabelBtn" title="Create label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <ul class="labels-tree">
+        <li class="tree-item" data-label="Client Matters">
+          <span class="label-dot" style="background-color: #c2a176;"></span>
+          <span>Client Matters</span>
+        </li>
+        <li class="tree-item" data-label="Corporate Inquiries">
+          <span class="label-dot" style="background-color: #0b57d0;"></span>
+          <span>Corporate Inquiries</span>
+        </li>
+        <li class="tree-item" data-label="Confidential">
+          <span class="label-dot" style="background-color: #b3261e;"></span>
+          <span>Confidential</span>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Central Email Canvas -->
+    <main class="gmail-main">
+
+      <!-- Email List Canvas -->
+      <div id="emailCanvas" style="display: flex; flex-direction: column; flex: 1; height: 100%; overflow: hidden;">
+        <!-- Quick Filter Chips -->
+        <div class="search-filter-chips">
+          <button class="chip-btn" id="chipTime">
+            <span>Any time</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <button class="chip-btn" id="chipAttachment">
+            <span>Has attachment</span>
+          </button>
+          <button class="chip-btn" id="chipUnread">
+            <span>Is unread</span>
+          </button>
+          <button class="chip-btn" id="chipMatter">
+            <span>Client Matters</span>
+          </button>
+        </div>
+
+        <!-- Action Toolbar -->
+        <div class="action-toolbar">
+          <div class="toolbar-left">
+            <div class="selection-menu-wrap">
+              <div class="checkbox-custom" id="selectAllCheckbox" title="Select all"></div>
+              <button class="caret-btn" title="Select options">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+              </button>
+            </div>
+
+            <div id="defaultToolbarTools" style="display: flex; align-items: center; gap: 4px;">
+              <button class="icon-btn" id="refreshBtn" title="Refresh mail">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+              </button>
+              <button class="icon-btn" title="More">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="5" r="2"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                  <circle cx="12" cy="19" r="2"></circle>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Bulk Actions Strip -->
+            <div class="bulk-actions-strip" id="bulkActionsStrip">
+              <button class="icon-btn" id="bulkDeleteBtn" title="Delete selected">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+              <button class="icon-btn" id="bulkReadBtn" title="Mark as read">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="toolbar-right">
+            <span class="pagination-text" id="paginationRange">0 of 0</span>
+            <button class="icon-btn" title="Newer">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="icon-btn" title="Older">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Emails List Container -->
+        <div class="email-list-container" id="emailList">
+          <!-- Live emails render here -->
+        </div>
+
+        <!-- Clean Empty State -->
+        <div class="empty-folder-state" id="emptyState">
+          <div class="empty-icon-wrap">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c2a176" stroke-width="1.75">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+            </svg>
+          </div>
+          <h4 style="margin-top: 16px; font-size: 17px; font-weight: 600; color: #1f1f1f;">No messages here</h4>
+          <p style="margin-top: 8px; font-size: 14px; color: #5f6368; max-width: 440px; text-align: center; line-height: 1.5;">
+            Your inbox is ready. Emails received via <strong>Resend.dev</strong> and stored in <strong>Supabase</strong> will appear here in real-time.
+          </p>
+          <div style="margin-top: 20px; display: flex; gap: 12px;">
+            <button type="button" class="btn-primary" onclick="document.getElementById('openComposeBtn').click()">Compose Email</button>
+            <button type="button" class="btn-secondary" onclick="document.getElementById('settingsGearBtn').click()">Connect Database</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Detailed Reading View -->
+      <div class="email-view-container" id="emailViewContainer">
+        <div class="view-toolbar">
+          <button class="icon-btn" id="backToListBtn" title="Back to list">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+          <button class="icon-btn" id="viewDeleteBtn" title="Delete">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+          <button class="icon-btn" id="viewMarkUnreadBtn" title="Mark as unread">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          </button>
+        </div>
+
+        <div class="view-body-wrap">
+          <h2 class="view-subject-title" id="viewSubject"></h2>
+
+          <div class="view-sender-row">
+            <div class="sender-left-info">
+              <div class="sender-avatar" id="viewSenderAvatar">C</div>
+              <div class="sender-names-block">
+                <span class="sender-display-name" id="viewSenderName"></span>
+                <span class="sender-email-address" id="viewSenderEmail"></span>
+                <span class="sender-to-me">to me</span>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 12px; color: #5f6368;" id="viewDate"></span>
+              <button class="icon-btn" id="viewStarBtn" title="Star message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="view-message-content" id="viewBody"></div>
+
+          <div class="view-reply-box">
+            <button class="view-action-pill" id="replyBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 17 4 12 9 7"></polyline><path d="M20 18v-2a4 4 0 0 0-4-4H4"></path></svg>
+              <span>Reply</span>
+            </button>
+            <button class="view-action-pill" id="forwardBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 17 20 12 15 7"></polyline><path d="M4 18v-2a4 4 0 0 1 4-4h12"></path></svg>
+              <span>Forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Right Utility Dock -->
+    <aside class="gmail-right-dock">
+      <!-- Calendar Icon -->
+      <button class="dock-app-icon" title="Court Dates &amp; Calendar" onclick="alert('Client Consultation & Court Calendar view')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0b57d0" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </button>
+
+      <!-- Legal Matter Notes -->
+      <button class="dock-app-icon" title="Matter Notes" onclick="alert('Matter Notes & Legal Memos')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c2a176" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      </button>
+
+      <!-- Client Contacts Directory -->
+      <button class="dock-app-icon" title="Client Directory" onclick="alert('Client Directory & Corporate Rolodex')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f1f1f" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <!-- Settings shortcut -->
+      <button class="dock-app-icon" title="Configure Database" onclick="document.getElementById('settingsGearBtn').click()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </aside>
+
+  </div>
+
+  <!-- ========================================================================
+       3. Floating Compose Window (Bottom Right)
+       ======================================================================== -->
+  <div class="compose-window" id="composeWindow">
+    <div class="compose-header">
+      <span class="compose-title">New Corporate Message</span>
+      <div class="compose-header-actions">
+        <button class="compose-header-btn" title="Minimize" id="minimizeComposeBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect y="11" width="24" height="2"></rect></svg>
+        </button>
+        <button class="compose-header-btn" id="closeComposeBtn" title="Close &amp; discard">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <form class="compose-body-form" id="composeForm">
+      <!-- Sender Selector (From) -->
+      <div class="compose-field compose-from-field">
+        <label for="composeFromSelect">From</label>
+        <div class="compose-from-wrapper">
+          <select id="composeFromSelect" class="compose-from-dropdown">
+            <option value="inquiries@mail.corporatelawgroup.org" data-name="Corporate Law Group Inquiries" selected>Inquiries &lt;inquiries@mail.corporatelawgroup.org&gt;</option>
+            <option value="support@mail.corporatelawgroup.org" data-name="Corporate Law Group Support">Support &lt;support@mail.corporatelawgroup.org&gt;</option>
+            <option value="__custom__">+ Custom Sender (e.g. pecker@mail.corporatelawgroup.org)...</option>
+          </select>
+          <div id="composeCustomFromRow" class="compose-custom-from-row" style="display: none;">
+            <input type="text" id="composeCustomFromName" placeholder="Display Name (optional)" class="compose-custom-input">
+            <div class="compose-custom-email-wrap">
+              <input type="text" id="composeCustomFromUser" placeholder="alias (e.g. pecker)" class="compose-custom-user">
+              <span class="compose-custom-domain">@mail.corporatelawgroup.org</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compose-field">
+        <label for="composeTo">To</label>
+        <input type="email" id="composeTo" placeholder="Recipient email address" required>
+      </div>
+      <div class="compose-field">
+        <input type="text" id="composeSubject" placeholder="Subject">
+      </div>
+      <textarea class="compose-textarea" id="composeBody" placeholder="Compose message..."></textarea>
+
+      <div class="compose-bottom-toolbar">
+        <div class="compose-send-group">
+          <button type="button" class="send-main-btn" id="sendEmailBtn">Send</button>
+        </div>
+
+        <div class="compose-tools-group">
+          <button type="button" class="icon-btn" id="discardDraftBtn" title="Discard draft">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- ========================================================================
+       4. Supabase & Resend Configuration Modal
+       ======================================================================== -->
+  <div class="settings-modal-overlay" id="settingsModal">
+    <div class="settings-modal-card">
+      <div class="settings-modal-header">
+        <h3>Supabase &amp; Resend.dev Configuration</h3>
+        <button class="icon-btn" id="closeSettingsBtn" title="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="settings-tabs-bar">
+        <button class="settings-tab-btn active" data-target="tabConnection">Database &amp; Sender Profiles</button>
+        <button class="settings-tab-btn" data-target="tabSql">Supabase SQL Schema</button>
+        <button class="settings-tab-btn" data-target="tabWebhook">Resend Inbound Setup</button>
+      </div>
+
+      <div class="settings-modal-body">
+        <!-- Tab 1: Connection Form -->
+        <div class="settings-tab-page" id="tabConnection">
+          <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">
+            Connected to Supabase cloud database with Realtime sync and Resend.dev custom domain.
+          </p>
+
+          <div class="settings-form-group">
+            <label for="cfgSupabaseUrl">Supabase Project URL</label>
+            <input type="text" id="cfgSupabaseUrl" value="https://xsnfafxcbdkyinytjhci.supabase.co">
+            <div class="settings-form-hint">Found in Supabase Dashboard &rarr; Project Settings &rarr; API &rarr; Project URL</div>
+          </div>
+
+          <div class="settings-form-group">
+            <label for="cfgSupabaseKey">Supabase Anon Key (Public API Key)</label>
+            <input type="password" id="cfgSupabaseKey" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzbmZhZnhjYmRreWlueXRqaGNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjIwOTgsImV4cCI6MjEwMzkzODA5OH0.7VgcsxW4LlbvoImnTCg7vX27jBCwcJO5VVTeh9ea3jw">
+            <div class="settings-form-hint">Found in Supabase Dashboard &rarr; Project Settings &rarr; API &rarr; Project API keys (anon / public)</div>
+          </div>
+
+          <div class="settings-form-group">
+            <label for="cfgResendKey">Resend.dev API Key (For sending outbound emails)</label>
+            <input type="password" id="cfgResendKey" placeholder="re_123456789abcdef...">
+            <div class="settings-form-hint">From Resend.dev &rarr; API Keys. Required for outbound email delivery.</div>
+          </div>
+
+          <div class="settings-form-group">
+            <label for="cfgSenderName">Default Sender Display Name</label>
+            <input type="text" id="cfgSenderName" value="Corporate Law Group Inquiries" placeholder="e.g. Your Name or Corporate Law Group">
+          </div>
+
+          <div class="settings-form-group">
+            <label for="cfgSenderEmail">Default Sender Email (@mail.corporatelawgroup.org)</label>
+            <input type="email" id="cfgSenderEmail" value="inquiries@mail.corporatelawgroup.org" placeholder="e.g. pecker@mail.corporatelawgroup.org">
+            <div class="settings-form-hint">Custom alias e.g. pecker@mail.corporatelawgroup.org, support@..., or inquiries@...</div>
+          </div>
+
+          <div class="settings-form-group">
+            <label for="cfgNotificationEmail">Consultation Alert Recipient Email</label>
+            <input type="email" id="cfgNotificationEmail" value="inquiries@mail.corporatelawgroup.org" placeholder="inquiries@mail.corporatelawgroup.org">
+            <div class="settings-form-hint">Where website consultation bookings &amp; client matter inquiries will be delivered.</div>
+          </div>
+        </div>
+
+        <!-- Tab 2: SQL Code Copy -->
+        <div class="settings-tab-page" id="tabSql" style="display: none;">
+          <p style="font-size: 13px; color: #5f6368; margin-bottom: 12px;">
+            Run this clean script in your <strong>Supabase SQL Editor</strong> to create the <code>emails</code> and <code>email_senders</code> tables, enable Realtime, and set up Row Level Security.
+          </p>
+          <pre class="sql-code-box" id="sqlCodeContent">-- 1. Create the emails table
+CREATE TABLE IF NOT EXISTS public.emails (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    message_id TEXT,
+    from_address TEXT NOT NULL,
+    from_name TEXT,
+    to_address TEXT NOT NULL,
+    to_name TEXT,
+    cc TEXT,
+    bcc TEXT,
+    reply_to TEXT,
+    subject TEXT DEFAULT '(no subject)',
+    snippet TEXT,
+    body_html TEXT,
+    body_text TEXT,
+    folder TEXT NOT NULL DEFAULT 'inbox',
+    is_read BOOLEAN NOT NULL DEFAULT false,
+    is_starred BOOLEAN NOT NULL DEFAULT false,
+    has_attachment BOOLEAN NOT NULL DEFAULT false,
+    attachments JSONB DEFAULT '[]'::jsonb,
+    labels JSONB DEFAULT '["Inbox"]'::jsonb,
+    raw_headers JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_emails_folder ON public.emails(folder);
+CREATE INDEX IF NOT EXISTS idx_emails_created_at ON public.emails(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_emails_is_read ON public.emails(is_read);
+CREATE INDEX IF NOT EXISTS idx_emails_is_starred ON public.emails(is_starred);
+CREATE INDEX IF NOT EXISTS idx_emails_to_address ON public.emails(to_address);
+CREATE INDEX IF NOT EXISTS idx_emails_from_address ON public.emails(from_address);
+
+-- 2. Create the email_senders table (Sender profiles & aliases)
+CREATE TABLE IF NOT EXISTS public.email_senders (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    display_name TEXT NOT NULL,
+    email_address TEXT NOT NULL UNIQUE,
+    is_default BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+INSERT INTO public.email_senders (display_name, email_address, is_default)
+VALUES 
+    ('Corporate Law Group Inquiries', 'inquiries@mail.corporatelawgroup.org', true),
+    ('Corporate Law Group Support', 'support@mail.corporatelawgroup.org', false)
+ON CONFLICT (email_address) DO NOTHING;
+
+-- 3. Enable RLS
+ALTER TABLE public.emails ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.email_senders ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow anon read all emails" ON public.emails FOR SELECT TO anon, authenticated, service_role USING (true);
+CREATE POLICY "Allow anon insert emails" ON public.emails FOR INSERT TO anon, authenticated, service_role WITH CHECK (true);
+CREATE POLICY "Allow anon update emails" ON public.emails FOR UPDATE TO anon, authenticated, service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Allow anon delete emails" ON public.emails FOR DELETE TO anon, authenticated, service_role USING (true);
+
+CREATE POLICY "Allow anon read senders" ON public.email_senders FOR SELECT TO anon, authenticated, service_role USING (true);
+CREATE POLICY "Allow anon insert senders" ON public.email_senders FOR INSERT TO anon, authenticated, service_role WITH CHECK (true);
+CREATE POLICY "Allow anon update senders" ON public.email_senders FOR UPDATE TO anon, authenticated, service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Allow anon delete senders" ON public.email_senders FOR DELETE TO anon, authenticated, service_role USING (true);
+
+-- 4. Enable Realtime
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'emails') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.emails;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'email_senders') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.email_senders;
+  END IF;
+END $$;</pre>
+          <button type="button" class="btn-secondary" id="copySqlBtn">Copy SQL Script</button>
+        </div>
+
+        <!-- Tab 3: Resend Inbound Guide -->
+        <div class="settings-tab-page" id="tabWebhook" style="display: none;">
+          <h4 style="font-size: 14px; margin-bottom: 8px;">How to receive emails from @mail.corporatelawgroup.org via Resend into Supabase:</h4>
+          <ol style="font-size: 13px; line-height: 1.8; color: #444746; padding-left: 20px;">
+            <li>Deploy the Supabase Edge Function provided at <code>email/resend_inbound_function.ts</code> using Supabase CLI:
+              <br><code>supabase functions deploy resend-inbound --no-verify-jwt</code>
+            </li>
+            <li>In your <strong>Resend Dashboard &rarr; Webhooks</strong>, add an endpoint:
+              <br><code>https://xsnfafxcbdkyinytjhci.supabase.co/functions/v1/resend-inbound</code>
+            </li>
+            <li>Select the <code>email.received</code> event.</li>
+            <li>Every incoming email to <code>inquiries@mail.corporatelawgroup.org</code>, <code>support@mail.corporatelawgroup.org</code>, or custom aliases (e.g. <code>pecker@mail.corporatelawgroup.org</code>) will immediately insert into Supabase and pop up in your inbox in real-time!</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="settings-modal-footer">
+        <div>
+          <button type="button" class="btn-secondary" id="clearEmailsBtn" style="color: #b3261e; border-color: #f2b8b5;">Clear Stored Emails</button>
+          <button type="button" class="btn-secondary" id="testConnectionBtn">Test Connection</button>
+        </div>
+        <button type="button" class="btn-primary" id="saveSettingsBtn">Save &amp; Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="gmail-toast" id="gmailToast">
+    <span id="toastMessage">Notification</span>
+  </div>
+
+  <!-- Application Scripts -->
+  <script type="module" src="email-service.js"></script>
+  <script type="module" src="gmail.js"></script>
+</body>
+</html>

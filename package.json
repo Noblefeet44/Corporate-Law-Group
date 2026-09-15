@@ -1,0 +1,17 @@
+{
+  "name": "corporate-law-group",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Corporate Law Group Webmail & Practice Portal",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --open /email/",
+    "dev:root": "vite --open /",
+    "start": "vite --open /email/",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.2.2"
+  }
+}
