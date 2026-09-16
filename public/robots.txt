@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /email/
+Disallow: /email.html
+Disallow: /api/
+
+Sitemap: https://www.corporatelawgroup.org/sitemap.xml
+Sitemap: https://corporatelawgroup.org/sitemap.xml
