@@ -62,13 +62,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const statusText = document.getElementById('statusText');
   const statusDot = document.getElementById('statusDot');
 
-  // Initial Data Load
+  // Initial Data Load & Attorney Identity
+  updateHeaderIdentity();
   await loadAndRender();
   updateBadgeCounts();
   updateStatusIndicator();
-  updateHeaderIdentity();
-  if (identityBadge) {
-    identityBadge.addEventListener('click', openSettings);
+
+  // Background inbound sync from Resend on load
+  if (window.emailService) {
+    window.emailService.syncInboundEmails().then(count => {
+      if (count > 0) {
+        loadAndRender();
+        updateBadgeCounts();
+      }
+    });
   }
 
   // Realtime Supabase incoming email subscriber
@@ -235,7 +242,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     viewSenderName.textContent = email.from_name || email.from_address;
     viewSenderEmail.textContent = `<${email.from_address}>`;
     viewDate.textContent = email.display_date || new Date().toLocaleString();
-    viewSenderAvatar.textContent = (email.from_name || email.from_address || 'C')[0].toUpperCase();
+    
+    const partnerAvatar = window.emailService.getAvatarForEmail(email.from_address);
+    if (partnerAvatar) {
+      viewSenderAvatar.innerHTML = `<img src="${partnerAvatar}" alt="${email.from_name || ''}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+    } else {
+      viewSenderAvatar.textContent = (email.from_name || email.from_address || 'C')[0].toUpperCase();
+    }
     
     viewBody.innerHTML = email.body_html ? sanitizeHtml(email.body_html) : `<p>${escapeHtml(email.body_text)}</p>`;
   }
@@ -452,6 +465,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function refreshComposeSenders() {
     if (!composeFromSelect) return;
     const senders = await window.emailService.getSenders();
+    const activeEmail = (window.emailService.config.senderEmail || '').toLowerCase();
     const currentVal = composeFromSelect.value;
     composeFromSelect.innerHTML = '';
 
@@ -459,8 +473,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const opt = document.createElement('option');
       opt.value = s.email;
       opt.dataset.name = s.name;
-      opt.textContent = `${s.name} <${s.email}>`;
-      if (s.isDefault) opt.selected = true;
+      opt.dataset.title = s.title || '';
+      opt.textContent = `${s.name} <${s.email}>` + (s.title ? ` (${s.title})` : '');
+      if (activeEmail && s.email.toLowerCase() === activeEmail) {
+        opt.selected = true;
+      } else if (!activeEmail && s.isDefault) {
+        opt.selected = true;
+      }
       composeFromSelect.appendChild(opt);
     });
 
@@ -469,7 +488,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     customOpt.textContent = '+ Custom Name / Custom Email...';
     composeFromSelect.appendChild(customOpt);
 
-    if (currentVal && currentVal !== '__custom__') {
+    if (currentVal && currentVal !== '__custom__' && (!activeEmail || currentVal.toLowerCase() === activeEmail)) {
       composeFromSelect.value = currentVal;
     }
   }
@@ -596,15 +615,179 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function updateHeaderIdentity() {
     const cfg = window.emailService.config;
-    const name = cfg.senderName || 'Corporate Law Group Inquiries';
-    const email = cfg.senderEmail || 'inquiries@mail.corporatelawgroup.org';
+    const name = cfg.senderName || 'Johnathan Vance';
+    const email = cfg.senderEmail || 'johnathan@mail.corporatelawgroup.org';
+    const avatar = cfg.senderAvatar || window.emailService.getAvatarForEmail(email) || '/assets/johnathan-vance.jpg';
+
     if (headerSenderName) headerSenderName.textContent = name;
     if (headerSenderEmail) headerSenderEmail.textContent = `<${email}>`;
     if (headerAvatar) {
-      const parts = name.split(' ').filter(Boolean);
-      const initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : name.slice(0, 2).toUpperCase();
-      headerAvatar.textContent = initials || 'CLG';
+      headerAvatar.innerHTML = `<img src="${avatar}" alt="${name}" id="headerAvatarImg">`;
     }
+  }
+
+  // Attorney Switcher Popover
+  const attorneySwitcherPopover = document.getElementById('attorneySwitcherPopover');
+  const attorneySwitcherList = document.getElementById('attorneySwitcherList');
+
+  function renderAttorneySwitcher() {
+    if (!attorneySwitcherList) return;
+    const directory = window.emailService.getAttorneyDirectory();
+    const currentEmail = (window.emailService.config.senderEmail || '').toLowerCase();
+    attorneySwitcherList.innerHTML = '';
+
+    directory.forEach(attorney => {
+      const isSelected = currentEmail === attorney.email.toLowerCase();
+      const item = document.createElement('div');
+      item.className = 'attorney-item' + (isSelected ? ' active' : '');
+      item.innerHTML = `
+        <img src="${attorney.avatar}" class="attorney-item-avatar" alt="${attorney.name}">
+        <div class="attorney-item-info">
+          <div class="attorney-item-name">${attorney.name}</div>
+          <div class="attorney-item-title">${attorney.title}</div>
+          <div class="attorney-item-email">${attorney.email}</div>
+        </div>
+        ${isSelected ? '<span class="attorney-item-check">✓</span>' : ''}
+      `;
+      item.addEventListener('click', () => {
+        switchActiveAttorney(attorney);
+        if (attorneySwitcherPopover) attorneySwitcherPopover.style.display = 'none';
+      });
+      attorneySwitcherList.appendChild(item);
+    });
+
+    // Option for General Inquiries
+    const inqItem = document.createElement('div');
+    const isInq = currentEmail.includes('inquiries@');
+    inqItem.className = 'attorney-item' + (isInq ? ' active' : '');
+    inqItem.innerHTML = `
+      <img src="/assets/logo.png" class="attorney-item-avatar" style="object-fit: contain; background: #0b57d0;" alt="Inquiries">
+      <div class="attorney-item-info">
+        <div class="attorney-item-name">Corporate Law Group Inquiries</div>
+        <div class="attorney-item-title">General Client Intake</div>
+        <div class="attorney-item-email">inquiries@mail.corporatelawgroup.org</div>
+      </div>
+      ${isInq ? '<span class="attorney-item-check">✓</span>' : ''}
+    `;
+    inqItem.addEventListener('click', () => {
+      switchActiveAttorney({
+        name: 'Corporate Law Group Inquiries',
+        email: 'inquiries@mail.corporatelawgroup.org',
+        title: 'General Client Intake',
+        avatar: '/assets/logo.png'
+      });
+      if (attorneySwitcherPopover) attorneySwitcherPopover.style.display = 'none';
+    });
+    attorneySwitcherList.appendChild(inqItem);
+  }
+
+  function switchActiveAttorney(attorney) {
+    window.emailService.saveConfig({
+      senderName: attorney.name,
+      senderEmail: attorney.email,
+      senderTitle: attorney.title || '',
+      senderAvatar: attorney.avatar || ''
+    });
+    updateHeaderIdentity();
+    renderAttorneySwitcher();
+    refreshComposeSenders();
+    showToast(`Active persona: ${attorney.name}`);
+  }
+
+  if (headerAvatar) {
+    headerAvatar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!attorneySwitcherPopover) return;
+      renderAttorneySwitcher();
+      attorneySwitcherPopover.style.display = attorneySwitcherPopover.style.display === 'none' ? 'block' : 'none';
+    });
+  }
+
+  if (identityBadge) {
+    identityBadge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!attorneySwitcherPopover) return;
+      renderAttorneySwitcher();
+      attorneySwitcherPopover.style.display = attorneySwitcherPopover.style.display === 'none' ? 'block' : 'none';
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (attorneySwitcherPopover && !attorneySwitcherPopover.contains(e.target) && e.target !== headerAvatar && e.target !== identityBadge) {
+      attorneySwitcherPopover.style.display = 'none';
+    }
+  });
+
+  // Partner & Legal Counsel Directory Modal (Right Dock)
+  const directoryModal = document.getElementById('directoryModal');
+  const attorneyDirectoryDockBtn = document.getElementById('attorneyDirectoryDockBtn');
+  const closeDirectoryBtn = document.getElementById('closeDirectoryBtn');
+  const directoryCardsGrid = document.getElementById('directoryCardsGrid');
+
+  function renderDirectoryModal() {
+    if (!directoryCardsGrid) return;
+    const directory = window.emailService.getAttorneyDirectory();
+    directoryCardsGrid.innerHTML = '';
+
+    directory.forEach(attorney => {
+      const card = document.createElement('div');
+      card.className = 'attorney-dossier-card';
+      card.innerHTML = `
+        <div class="dossier-top">
+          <img src="${attorney.avatar}" class="dossier-photo" alt="${attorney.name}">
+          <div>
+            <div class="dossier-name">${attorney.name}</div>
+            <div class="dossier-title">${attorney.title}</div>
+            <a href="mailto:${attorney.email}" class="dossier-email">${attorney.email}</a>
+          </div>
+        </div>
+        <div class="dossier-meta">
+          <div><strong>Practice:</strong> ${attorney.practice || 'Corporate Law'}</div>
+          <div><strong>Education:</strong> ${attorney.education || 'Columbia Law School'}</div>
+          <div><strong>Experience:</strong> ${attorney.experience || 'BigLaw & Boutique'}</div>
+        </div>
+        <div class="dossier-actions">
+          <button type="button" class="btn-dossier-action btn-dossier-primary" data-action="switch">
+            Switch Persona
+          </button>
+          <button type="button" class="btn-dossier-action btn-dossier-secondary" data-action="compose">
+            Compose as ${attorney.name.split(' ')[0]}
+          </button>
+        </div>
+      `;
+
+      card.querySelector('[data-action="switch"]').addEventListener('click', () => {
+        switchActiveAttorney(attorney);
+        directoryModal.style.display = 'none';
+      });
+
+      card.querySelector('[data-action="compose"]').addEventListener('click', () => {
+        switchActiveAttorney(attorney);
+        directoryModal.style.display = 'none';
+        openComposeModal();
+      });
+
+      directoryCardsGrid.appendChild(card);
+    });
+  }
+
+  if (attorneyDirectoryDockBtn) {
+    attorneyDirectoryDockBtn.addEventListener('click', () => {
+      renderDirectoryModal();
+      directoryModal.style.display = 'flex';
+    });
+  }
+
+  if (closeDirectoryBtn) {
+    closeDirectoryBtn.addEventListener('click', () => {
+      directoryModal.style.display = 'none';
+    });
+  }
+
+  if (directoryModal) {
+    directoryModal.addEventListener('click', (e) => {
+      if (e.target === directoryModal) directoryModal.style.display = 'none';
+    });
   }
 
   function openSettings() {

@@ -6,10 +6,54 @@
 // Starting clean with no hardcoded sample messages
 const INITIAL_EMAILS = [];
 
+// Master Directory of Attorneys & Partners
+const ATTORNEY_DIRECTORY = [
+  {
+    name: 'Johnathan Vance',
+    email: 'johnathan@mail.corporatelawgroup.org',
+    title: 'Managing Partner',
+    practice: 'Corporate & Business Law • Banking & Finance • Tax',
+    education: 'J.D., Columbia Law School',
+    experience: '26+ Years BigLaw & Boutique',
+    avatar: '/assets/johnathan-vance.jpg',
+    isDefault: true
+  },
+  {
+    name: 'Eleanor Sterling',
+    email: 'eleanor@mail.corporatelawgroup.org',
+    title: 'Partner & Head of Banking & Finance',
+    practice: 'Commercial Lending • Credit Facilities • FinTech',
+    education: 'J.D., Harvard Law School',
+    experience: '18+ Years Financial Markets',
+    avatar: '/assets/eleanor-sterling.jpg',
+    isDefault: false
+  },
+  {
+    name: 'Marcus Chen',
+    email: 'marcus@mail.corporatelawgroup.org',
+    title: 'Partner & Head of Tax Practice',
+    practice: 'Corporate Taxation • M&A Tax Strategy • IRS Disputes',
+    education: 'LL.M. in Taxation, NYU School of Law',
+    experience: '19+ Years Tax Advisory',
+    avatar: '/assets/marcus-chen.jpg',
+    isDefault: false
+  },
+  {
+    name: 'Sofia Ramirez',
+    email: 'sofia@mail.corporatelawgroup.org',
+    title: 'Senior Counsel',
+    practice: 'Startup Formation • Corporate Governance • Commercial Contracts',
+    education: 'J.D., Stanford Law School',
+    experience: '12+ Years Tech & Corporate',
+    avatar: '/assets/sofia-ramirez.jpg',
+    isDefault: false
+  }
+];
+
 class EmailService {
   constructor() {
-    this.storageKey = 'clg_webmail_data_v2'; // New key so old sample data is cleared
-    this.configKey = 'clg_webmail_config_v2';
+    this.storageKey = 'clg_webmail_data_v2';
+    this.configKey = 'clg_webmail_config_v3'; // Bump key to load attorney profiles fresh
     this.supabase = null;
     this.realtimeChannel = null;
     this.onNewEmailCallback = null;
@@ -19,36 +63,39 @@ class EmailService {
     this.initSupabaseIfConfigured();
   }
 
+  getAttorneyDirectory() {
+    return ATTORNEY_DIRECTORY;
+  }
+
+  getAvatarForEmail(email) {
+    if (!email) return null;
+    const lower = String(email).toLowerCase();
+    for (const a of ATTORNEY_DIRECTORY) {
+      const alias = a.email.split('@')[0].toLowerCase();
+      if (lower.includes(a.email.toLowerCase()) || lower.includes(alias)) {
+        return a.avatar;
+      }
+    }
+    return null;
+  }
+
   loadConfig() {
     const saved = localStorage.getItem(this.configKey);
     const defaults = this.getDefaultConfig();
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Clean out any old sample Alex Jame references from previous tests
-        if (parsed.senderEmail && parsed.senderEmail.toLowerCase().includes('alex@')) {
-          parsed.senderEmail = defaults.senderEmail;
-          parsed.senderName = defaults.senderName;
-        }
-        if (parsed.senderName && parsed.senderName.toLowerCase().includes('alex')) {
-          parsed.senderName = defaults.senderName;
-        }
+        // Ensure all partner senders exist
+        const sendersMap = new Map();
+        defaults.senders.forEach(s => sendersMap.set(s.email.toLowerCase(), s));
         if (Array.isArray(parsed.senders)) {
-          parsed.senders = parsed.senders.filter(s => !s.email.toLowerCase().includes('alex@'));
+          parsed.senders.forEach(s => {
+            if (!s.email.toLowerCase().includes('alex@')) {
+              sendersMap.set(s.email.toLowerCase(), { ...(sendersMap.get(s.email.toLowerCase()) || {}), ...s });
+            }
+          });
         }
-        // Ensure credentials and domain are up to date if previously unset or old
-        if (!parsed.supabaseUrl || parsed.supabaseUrl.trim() === '') {
-          parsed.supabaseUrl = defaults.supabaseUrl;
-        }
-        if (!parsed.supabaseKey || parsed.supabaseKey.trim() === '') {
-          parsed.supabaseKey = defaults.supabaseKey;
-        }
-        if (!parsed.domain || (parsed.domain.includes('corporatelawgroup.org') && !parsed.domain.includes('mail.'))) {
-          parsed.domain = defaults.domain;
-        }
-        if (!parsed.senders || parsed.senders.length === 0) {
-          parsed.senders = defaults.senders;
-        }
+        parsed.senders = Array.from(sendersMap.values());
         this.config = { ...defaults, ...parsed };
         localStorage.setItem(this.configKey, JSON.stringify(this.config));
       } catch (e) {
@@ -66,13 +113,28 @@ class EmailService {
       supabaseTable: 'emails',
       domain: 'mail.corporatelawgroup.org',
       resendApiKey: '',
-      senderEmail: 'inquiries@mail.corporatelawgroup.org',
-      senderName: 'Corporate Law Group Inquiries',
+      senderEmail: 'johnathan@mail.corporatelawgroup.org',
+      senderName: 'Johnathan Vance',
+      senderTitle: 'Managing Partner',
+      senderAvatar: '/assets/johnathan-vance.jpg',
       notificationEmail: 'inquiries@mail.corporatelawgroup.org',
       isSupabaseConnected: false,
       senders: [
-        { name: 'Corporate Law Group Inquiries', email: 'inquiries@mail.corporatelawgroup.org', isDefault: true },
-        { name: 'Corporate Law Group Support', email: 'support@mail.corporatelawgroup.org', isDefault: false }
+        ...ATTORNEY_DIRECTORY,
+        {
+          name: 'Corporate Law Group Inquiries',
+          email: 'inquiries@mail.corporatelawgroup.org',
+          title: 'General Client Intake',
+          avatar: '/assets/logo.png',
+          isDefault: false
+        },
+        {
+          name: 'Corporate Law Group Support',
+          email: 'support@mail.corporatelawgroup.org',
+          title: 'Client Support & Legal Billing',
+          avatar: '/assets/logo.png',
+          isDefault: false
+        }
       ]
     };
   }

@@ -63,9 +63,9 @@
     <!-- Header Right Utilities -->
     <div class="header-right">
       <!-- Active Sender Identity Pill -->
-      <div class="identity-badge" id="identityBadge" title="Active Sender Profile: click to configure in Settings">
-        <span class="identity-name" id="headerSenderName">Corporate Law Group Inquiries</span>
-        <span class="identity-email" id="headerSenderEmail">&lt;inquiries@mail.corporatelawgroup.org&gt;</span>
+      <div class="identity-badge" id="identityBadge" title="Active Sender Persona (Click to switch partner profile)">
+        <span class="identity-name" id="headerSenderName">Johnathan Vance</span>
+        <span class="identity-email" id="headerSenderEmail">&lt;johnathan@mail.corporatelawgroup.org&gt;</span>
       </div>
 
       <!-- Live DB Connection Indicator -->
@@ -81,8 +81,21 @@
         </svg>
       </button>
 
-      <!-- Rebranded Firm Avatar -->
-      <div class="avatar-circle" id="headerAvatar" title="Active Account">CLG</div>
+      <!-- Rebranded Firm Avatar with Attorney Profile Photo -->
+      <div class="avatar-circle" id="headerAvatar" title="Switch Attorney Profile">
+        <img id="headerAvatarImg" src="/assets/johnathan-vance.jpg" alt="Active Attorney">
+      </div>
+
+      <!-- Attorney Switcher Popover -->
+      <div class="attorney-switcher-popover" id="attorneySwitcherPopover" style="display: none;">
+        <div class="popover-header">
+          <span class="popover-title">Corporate Law Group Partners</span>
+          <span class="popover-subtitle">Click to switch active sender persona</span>
+        </div>
+        <div class="attorney-list" id="attorneySwitcherList">
+          <!-- Populated in JS -->
+        </div>
+      </div>
     </div>
   </header>
 
@@ -365,8 +378,8 @@
         </svg>
       </button>
 
-      <!-- Client Contacts Directory -->
-      <button class="dock-app-icon" title="Client Directory" onclick="alert('Client Directory & Corporate Rolodex')">
+      <!-- Partner & Legal Counsel Directory -->
+      <button class="dock-app-icon" id="attorneyDirectoryDockBtn" title="Partner &amp; Legal Counsel Directory">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f1f1f" stroke-width="2">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="9" cy="7" r="4"></circle>
@@ -610,6 +623,31 @@ END $$;</pre>
           <button type="button" class="btn-secondary" id="testConnectionBtn">Test Connection</button>
         </div>
         <button type="button" class="btn-primary" id="saveSettingsBtn">Save &amp; Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Attorney Counsel Directory Modal (From Dock)
+       ======================================================================== -->
+  <div class="settings-modal-backdrop" id="directoryModal" style="display: none;">
+    <div class="directory-modal-card">
+      <div class="settings-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(11, 87, 208, 0.1); color: #0b57d0; display: flex; align-items: center; justify-content: center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #1f1f1f;">Partner &amp; Legal Counsel Directory</h3>
+            <p style="margin: 2px 0 0; font-size: 12px; color: #5f6368;">Corporate Law Group Webmail &bull; Verified Legal Identities</p>
+          </div>
+        </div>
+        <button class="icon-btn" id="closeDirectoryBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="directory-cards-grid" id="directoryCardsGrid">
+        <!-- Rendered dynamically -->
       </div>
     </div>
   </div>
