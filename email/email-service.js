@@ -79,139 +79,6 @@ class EmailService {
     return null;
   }
 
-  getAttorneyForEmail(email, fallbackName) {
-    const lower = String(email || '').toLowerCase();
-    for (const a of ATTORNEY_DIRECTORY) {
-      const alias = a.email.split('@')[0].toLowerCase();
-      if (lower.includes(a.email.toLowerCase()) || lower.includes(alias)) {
-        return a;
-      }
-    }
-    if (lower.includes('support')) {
-      return {
-        name: fallbackName || 'Corporate Law Group Support',
-        email: email || 'support@mail.corporatelawgroup.org',
-        title: 'Legal Operations & Client Billing',
-        practice: 'Client Services & Practice Administration',
-        education: 'Corporate Operations Management',
-        avatar: '/assets/logo.png',
-        phone: '+1 (800) 592-2529',
-        office: '1000 Louisiana Street, Suite 4800, Houston, TX 77002'
-      };
-    }
-    if (lower.includes('inquiries')) {
-      return {
-        name: fallbackName || 'Corporate Law Group Inquiries',
-        email: email || 'inquiries@mail.corporatelawgroup.org',
-        title: 'General Legal Intake & Advisory Panel',
-        practice: 'Corporate Law & Commercial Intake',
-        education: 'Legal Intake Board',
-        avatar: '/assets/logo.png',
-        phone: '+1 (800) 592-2529',
-        office: '1000 Louisiana Street, Suite 4800, Houston, TX 77002'
-      };
-    }
-    return {
-      name: fallbackName || 'Corporate Law Group Counsel',
-      email: email || 'counsel@mail.corporatelawgroup.org',
-      title: 'Legal Counsel',
-      practice: 'Corporate & Business Law • Banking & Finance • Tax Law',
-      education: 'Juris Doctor | Corporate Law Group Practice',
-      avatar: '/assets/logo.png',
-      phone: '+1 (800) 592-2529',
-      office: '1000 Louisiana Street, Suite 4800, Houston, TX 77002'
-    };
-  }
-
-  wrapWithBrandedTemplate({ content, fromName, fromEmail, subject }) {
-    const attorney = this.getAttorneyForEmail(fromEmail, fromName);
-    const domainOrigin = (typeof window !== 'undefined' && window.location.origin) ? window.location.origin : 'https://corporatelawgroup.org';
-    const avatarUrl = attorney.avatar.startsWith('http') ? attorney.avatar : `${domainOrigin}${attorney.avatar}`;
-
-    return `<!-- CLG-BRANDED-TEMPLATE -->
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${subject || 'Corporate Law Group Communication'}</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #1e293b;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f1f5f9; padding: 28px 12px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(0,0,0,0.06);" cellspacing="0" cellpadding="0" border="0">
-          <tr>
-            <td style="background: linear-gradient(135deg, #0a192f 0%, #0d274d 100%); padding: 26px 32px; border-bottom: 3px solid #c2a176;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td>
-                    <div style="font-size: 19px; font-weight: 800; letter-spacing: 1px; color: #ffffff; text-transform: uppercase; font-family: 'Open Sans', Arial, sans-serif;">
-                      CORPORATE LAW GROUP
-                    </div>
-                    <div style="font-size: 11px; font-weight: 600; color: #c2a176; letter-spacing: 0.8px; margin-top: 4px; text-transform: uppercase;">
-                      Houston &bull; Dallas &bull; Austin &bull; Nationwide Practice
-                    </div>
-                  </td>
-                  <td align="right" valign="middle">
-                    <span style="display: inline-block; background-color: rgba(194,161,118,0.18); color: #c2a176; border: 1px solid rgba(194,161,118,0.4); font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 5px 11px; border-radius: 4px; letter-spacing: 0.6px;">
-                      Privileged &amp; Confidential
-                    </span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 34px 32px 28px; font-size: 15px; line-height: 1.7; color: #1e293b;">
-              ${content}
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 0 32px 28px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-top: 1px solid #e2e8f0; padding-top: 24px;">
-                <tr>
-                  <td width="72" valign="top" style="padding-right: 18px;">
-                    <img src="${avatarUrl}" alt="${attorney.name}" width="68" height="68" style="width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 2px solid #0b57d0; display: block;" />
-                  </td>
-                  <td valign="top" style="line-height: 1.45;">
-                    <div style="font-size: 16px; font-weight: 800; color: #0a192f; margin-bottom: 2px;">
-                      ${attorney.name}
-                    </div>
-                    <div style="font-size: 12.5px; font-weight: 700; color: #c2a176; margin-bottom: 4px;">
-                      ${attorney.title}
-                    </div>
-                    <div style="font-size: 11.5px; color: #475569; margin-bottom: 4px;">
-                      <strong>Practice:</strong> ${attorney.practice}
-                    </div>
-                    <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">
-                      ${attorney.education}
-                    </div>
-                    <div style="font-size: 11px; color: #475569; line-height: 1.6;">
-                      <strong>Corporate Law Group, PLLC</strong><br>
-                      ${attorney.office || '1000 Louisiana Street, Suite 4800, Houston, TX 77002'}<br>
-                      <strong>Tel:</strong> <a href="tel:+18005922529" style="color: #0b57d0; text-decoration: none;">+1 (800) 592-2529</a> &bull; 
-                      <strong>Direct:</strong> <a href="mailto:${fromEmail}" style="color: #0b57d0; text-decoration: none;">${fromEmail}</a> &bull; 
-                      <a href="https://corporatelawgroup.org" style="color: #0b57d0; text-decoration: none;">corporatelawgroup.org</a>
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="background-color: #f8fafc; padding: 18px 32px; border-top: 1px solid #e2e8f0; font-size: 10px; line-height: 1.55; color: #64748b; text-align: justify;">
-              <strong>CONFIDENTIALITY NOTICE:</strong> This electronic transmission (including any attachments) contains legally privileged and confidential attorney-client communication or work product intended solely for the use of the individual or entity named as recipient. If you are not the intended recipient, please be aware that any review, disclosure, copying, distribution, or taking of any action in reliance on the contents of this communication is strictly prohibited. If you received this transmission in error, please immediately notify the sender by reply email and destroy all copies of the original message and attachments.
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-  }
-
   loadConfig() {
     const saved = localStorage.getItem(this.configKey);
     const defaults = this.getDefaultConfig();
@@ -622,15 +489,6 @@ class EmailService {
       finalName = prefix ? (prefix.charAt(0).toUpperCase() + prefix.slice(1)) : 'Corporate Law Group';
     }
 
-    const finalHtml = (bodyHtml && bodyHtml.includes('<!-- CLG-BRANDED-TEMPLATE -->'))
-      ? bodyHtml
-      : this.wrapWithBrandedTemplate({
-          content: bodyHtml || `<p>${bodyText}</p>`,
-          fromName: finalName,
-          fromEmail: finalEmail,
-          subject: subject || '(no subject)'
-        });
-
     const newEmail = {
       id: 'sent-' + Date.now(),
       from_address: finalEmail,
@@ -639,8 +497,8 @@ class EmailService {
       cc: cc || '',
       bcc: bcc || '',
       subject: subject || '(no subject)',
-      snippet: (bodyText || (bodyHtml && bodyHtml.replace(/<[^>]*>/g, ' ')) || '').slice(0, 140),
-      body_html: finalHtml,
+      snippet: (bodyText || bodyHtml.replace(/<[^>]*>/g, ' ')).slice(0, 140),
+      body_html: bodyHtml || `<p>${bodyText}</p>`,
       body_text: bodyText || '',
       folder: 'sent',
       is_read: true,
@@ -665,7 +523,7 @@ class EmailService {
           cc: cc || undefined,
           bcc: bcc || undefined,
           subject: subject || '(no subject)',
-          html: finalHtml,
+          html: bodyHtml || bodyText,
           text: bodyText || undefined
         })
       });
@@ -693,7 +551,7 @@ class EmailService {
             from: `${finalName} <${finalEmail}>`,
             to: to.split(',').map(s => s.trim()),
             subject: subject || '(no subject)',
-            html: finalHtml,
+            html: bodyHtml || bodyText,
             text: bodyText || undefined
           })
         });

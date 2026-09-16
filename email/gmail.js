@@ -62,112 +62,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const statusText = document.getElementById('statusText');
   const statusDot = document.getElementById('statusDot');
 
-  // Portal Security Lock Elements (/email password protection)
-  const portalLockOverlay = document.getElementById('portalLockOverlay');
-  const portalLockForm = document.getElementById('portalLockForm');
-  const portalPasswordInput = document.getElementById('portalPasswordInput');
-  const portalLockError = document.getElementById('portalLockError');
-  const togglePasswordVisibilityBtn = document.getElementById('togglePasswordVisibilityBtn');
-  const eyeIconOpen = document.getElementById('eyeIconOpen');
-  const eyeIconClosed = document.getElementById('eyeIconClosed');
-  const lockPortalBtn = document.getElementById('lockPortalBtn');
-
-  // Check portal authentication state
-  function isPortalAuthorized() {
-    return sessionStorage.getItem('clg_webmail_auth') === 'authorized' || localStorage.getItem('clg_webmail_auth') === 'authorized';
-  }
-
-  function enforcePortalSecurity() {
-    if (isPortalAuthorized()) {
-      document.documentElement.classList.remove('portal-locked');
-      if (portalLockOverlay) portalLockOverlay.style.display = 'none';
-      return true;
-    } else {
-      document.documentElement.classList.add('portal-locked');
-      if (portalLockOverlay) {
-        portalLockOverlay.style.display = 'flex';
-        setTimeout(() => {
-          if (portalPasswordInput) portalPasswordInput.focus();
-        }, 120);
-      }
-      return false;
-    }
-  }
-
-  function handleUnlockSubmit(e) {
-    if (e) e.preventDefault();
-    const entered = (portalPasswordInput ? portalPasswordInput.value : '').trim();
-    // Required password: Email@password
-    if (entered === 'Email@password') {
-      sessionStorage.setItem('clg_webmail_auth', 'authorized');
-      localStorage.setItem('clg_webmail_auth', 'authorized');
-      document.documentElement.classList.remove('portal-locked');
-      if (portalLockOverlay) portalLockOverlay.style.display = 'none';
-      if (portalLockError) portalLockError.style.display = 'none';
-      showToast('Portal unlocked. Welcome to Corporate Law Group Webmail.');
-      loadAndRender();
-      updateBadgeCounts();
-    } else {
-      if (portalLockError) {
-        portalLockError.style.display = 'flex';
-        portalLockError.classList.remove('shake');
-        void portalLockError.offsetWidth; // re-trigger animation
-        portalLockError.classList.add('shake');
-      }
-      if (portalPasswordInput) {
-        portalPasswordInput.value = '';
-        portalPasswordInput.focus();
-      }
-    }
-  }
-
-  if (portalLockForm) {
-    portalLockForm.addEventListener('submit', handleUnlockSubmit);
-  }
-
-  if (togglePasswordVisibilityBtn && portalPasswordInput) {
-    togglePasswordVisibilityBtn.addEventListener('click', () => {
-      const isPwd = portalPasswordInput.type === 'password';
-      portalPasswordInput.type = isPwd ? 'text' : 'password';
-      if (eyeIconOpen && eyeIconClosed) {
-        eyeIconOpen.style.display = isPwd ? 'none' : 'block';
-        eyeIconClosed.style.display = isPwd ? 'block' : 'none';
-      }
-    });
-  }
-
-  if (lockPortalBtn) {
-    lockPortalBtn.addEventListener('click', () => {
-      sessionStorage.removeItem('clg_webmail_auth');
-      localStorage.removeItem('clg_webmail_auth');
-      document.documentElement.classList.add('portal-locked');
-      if (portalLockOverlay) {
-        portalLockOverlay.style.display = 'flex';
-        if (portalLockError) portalLockError.style.display = 'none';
-        if (portalPasswordInput) {
-          portalPasswordInput.value = '';
-          portalPasswordInput.focus();
-        }
-      }
-      showToast('Webmail portal locked.');
-    });
-  }
-
-  // Initial Portal Security Enforcement
-  const authorized = enforcePortalSecurity();
-
   // Initial Data Load & Attorney Identity
   updateHeaderIdentity();
-  if (authorized) {
-    await loadAndRender();
-    updateBadgeCounts();
-    updateStatusIndicator();
-  }
+  await loadAndRender();
+  updateBadgeCounts();
+  updateStatusIndicator();
 
   // Background inbound sync from Resend on load
   if (window.emailService) {
     window.emailService.syncInboundEmails().then(count => {
-      if (count > 0 && isPortalAuthorized()) {
+      if (count > 0) {
         loadAndRender();
         updateBadgeCounts();
       }
@@ -177,11 +81,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Realtime Supabase incoming email subscriber
   if (window.emailService) {
     window.emailService.setNewEmailListener((newEmail) => {
-      if (isPortalAuthorized()) {
-        showToast(`New email received: ${newEmail.subject || '(no subject)'}`);
-        loadAndRender();
-        updateBadgeCounts();
-      }
+      showToast(`New email received: ${newEmail.subject || '(no subject)'}`);
+      loadAndRender();
+      updateBadgeCounts();
     });
   }
 
@@ -591,39 +493,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function updateComposeSignatureNotice() {
-    const noticeEl = document.getElementById('composeSignatureNotice');
-    if (!noticeEl) return;
-    const sigAvatar = document.getElementById('composeSigAvatar');
-    const sigName = document.getElementById('composeSigName');
-    const sigTitle = document.getElementById('composeSigTitle');
-    const sigPractice = document.getElementById('composeSigPractice');
-    const sigOffice = document.getElementById('composeSigOffice');
-
-    let fromEmail = '';
-    let fromName = '';
-
-    if (composeFromSelect && composeFromSelect.value === '__custom__') {
-      let userInput = (composeCustomFromUser && composeCustomFromUser.value.trim()) || 'inquiries';
-      let rawName = (composeCustomFromName && composeCustomFromName.value.trim()) || '';
-      fromEmail = userInput.includes('@') ? userInput : `${userInput}@mail.corporatelawgroup.org`;
-      fromName = rawName || fromEmail.split('@')[0];
-    } else if (composeFromSelect && composeFromSelect.selectedOptions[0]) {
-      fromEmail = composeFromSelect.value;
-      fromName = composeFromSelect.selectedOptions[0].dataset.name || window.emailService.config.senderName || 'Corporate Law Group';
-    } else {
-      fromEmail = window.emailService.config.senderEmail || 'johnathan@mail.corporatelawgroup.org';
-      fromName = window.emailService.config.senderName || 'Johnathan Vance';
-    }
-
-    const att = window.emailService.getAttorneyForEmail(fromEmail, fromName);
-    if (sigAvatar) sigAvatar.src = att.avatar;
-    if (sigName) sigName.textContent = att.name;
-    if (sigTitle) sigTitle.textContent = att.title ? `• ${att.title}` : '';
-    if (sigPractice) sigPractice.textContent = `${att.practice || 'Corporate Law'} • ${att.education || 'Columbia Law School'}`;
-    if (sigOffice) sigOffice.textContent = `Houston Office • 1000 Louisiana St, Suite 4800`;
-  }
-
   if (composeFromSelect) {
     composeFromSelect.addEventListener('change', () => {
       if (composeFromSelect.value === '__custom__') {
@@ -634,15 +503,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         if (composeCustomFromRow) composeCustomFromRow.style.display = 'none';
       }
-      updateComposeSignatureNotice();
     });
-  }
-
-  if (composeCustomFromName) {
-    composeCustomFromName.addEventListener('input', updateComposeSignatureNotice);
-  }
-  if (composeCustomFromUser) {
-    composeCustomFromUser.addEventListener('input', updateComposeSignatureNotice);
   }
 
   function openComposeModal({ to = '', subject = '', body = '' } = {}) {
@@ -651,7 +512,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     composeSubject.value = subject;
     composeBody.value = body;
     if (composeCustomFromRow) composeCustomFromRow.style.display = 'none';
-    updateComposeSignatureNotice();
     composeWindow.classList.add('visible');
     if (!to) {
       composeTo.focus();
@@ -831,7 +691,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateHeaderIdentity();
     renderAttorneySwitcher();
     refreshComposeSenders();
-    updateComposeSignatureNotice();
     showToast(`Active persona: ${attorney.name}`);
   }
 
