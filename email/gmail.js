@@ -436,6 +436,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   refreshBtn.addEventListener('click', async () => {
     refreshBtn.style.transform = 'rotate(360deg)';
     refreshBtn.style.transition = 'transform 0.6s ease';
+    await window.emailService.syncInboundEmails();
     await loadAndRender();
     updateBadgeCounts();
     setTimeout(() => {
@@ -527,8 +528,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (composeFromSelect && composeFromSelect.value === '__custom__') {
       let userInput = (composeCustomFromUser && composeCustomFromUser.value.trim()) || 'inquiries';
-      fromEmail = userInput.includes('@') ? userInput : `${userInput}@mail.corporatelawgroup.org`;
-      fromName = (composeCustomFromName && composeCustomFromName.value.trim()) || '';
+      let rawName = (composeCustomFromName && composeCustomFromName.value.trim()) || '';
+
+      // Check if user entered "Name <email@domain>" format
+      const combined = `${rawName} ${userInput}`;
+      const angleMatch = combined.match(/^(.*?)\s*<(.+?)>$/);
+      if (angleMatch) {
+        fromName = angleMatch[1].replace(/["']/g, '').trim();
+        fromEmail = angleMatch[2].trim();
+      } else {
+        fromEmail = userInput.includes('@') ? userInput : `${userInput}@mail.corporatelawgroup.org`;
+        fromName = rawName || fromEmail.split('@')[0];
+      }
+
       if (!fromName) {
         const prefix = fromEmail.split('@')[0];
         fromName = prefix ? (prefix.charAt(0).toUpperCase() + prefix.slice(1)) : 'Corporate Law Group';
@@ -544,24 +556,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       fromName = window.emailService.config.senderName || 'Corporate Law Group Inquiries';
     }
 
-    await window.emailService.sendEmail({
-      fromName,
-      fromEmail,
-      to,
-      subject: subject || '(no subject)',
-      bodyHtml: `<p>${escapeHtml(body).replace(/\n/g, '<br>')}</p>`,
-      bodyText: body
-    });
+    try {
+      await window.emailService.sendEmail({
+        fromName,
+        fromEmail,
+        to,
+        subject: subject || '(no subject)',
+        bodyHtml: `<p>${escapeHtml(body).replace(/\n/g, '<br>')}</p>`,
+        bodyText: body
+      });
 
-    sendEmailBtn.disabled = false;
-    sendEmailBtn.textContent = 'Send';
-    composeWindow.classList.remove('visible');
-
-    showToast(`Email sent from ${fromName} <${fromEmail}>`);
-    if (state.currentFolder === 'sent') {
-      await loadAndRender();
+      composeWindow.classList.remove('visible');
+      showToast(`Email sent from ${fromName} <${fromEmail}>`);
+      if (state.currentFolder === 'sent') {
+        await loadAndRender();
+      }
+      updateBadgeCounts();
+    } catch (err) {
+      alert(`Could not send email: ${err.message || err}`);
+    } finally {
+      sendEmailBtn.disabled = false;
+      sendEmailBtn.textContent = 'Send';
     }
-    updateBadgeCounts();
   });
 
   // ============================================================================

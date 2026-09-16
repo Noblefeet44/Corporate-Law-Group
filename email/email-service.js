@@ -398,6 +398,23 @@ class EmailService {
     return newSender;
   }
 
+  // Sync inbound emails directly from Resend via serverless sync endpoint
+  async syncInboundEmails() {
+    try {
+      const res = await fetch('/api/sync-emails');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.count > 0) {
+          console.log(`[EmailService] Synced ${data.count} inbound emails from Resend.`);
+          return data.count;
+        }
+      }
+    } catch (e) {
+      // offline/dev mode
+    }
+    return 0;
+  }
+
   // Send Email (Resend.dev API + Supabase sync)
   async sendEmail({ fromName, fromEmail, to, cc, bcc, subject, bodyHtml, bodyText }) {
     let finalEmail = (fromEmail || this.config.senderEmail || 'inquiries@mail.corporatelawgroup.org').trim();
@@ -431,6 +448,8 @@ class EmailService {
     };
 
     let resendResult = null;
+    let sendError = null;
+
     // 1. Try Vercel serverless function /api/send-email first (uses RESEND_API_KEY from Vercel)
     try {
       const vResponse = await fetch('/api/send-email', {
@@ -449,12 +468,15 @@ class EmailService {
       if (vResponse.ok) {
         resendResult = await vResponse.json();
         newEmail.message_id = resendResult.id;
+      } else {
+        const errData = await vResponse.json().catch(() => ({}));
+        sendError = new Error(errData.error || errData.message || `Server error (${vResponse.status})`);
       }
     } catch (apiErr) {
-      // Vercel function not reachable (e.g. local vite dev without API server)
+      sendError = apiErr;
     }
 
-    // 2. Fallback to direct client-side Resend API if API key is provided locally
+    // 2. Fallback to direct client-side Resend API if API key is provided in localStorage
     if (!resendResult && this.config.resendApiKey) {
       try {
         const response = await fetch('https://api.resend.com/emails', {
@@ -475,10 +497,20 @@ class EmailService {
         resendResult = await response.json();
         if (response.ok) {
           newEmail.message_id = resendResult.id;
+          sendError = null;
+        } else {
+          sendError = new Error(resendResult.message || 'Resend API rejected message');
         }
       } catch (err) {
         console.warn('[Resend API] Direct fetch error:', err);
+        sendError = err;
       }
+    }
+
+    // If both failed and we couldn't send, throw the error
+    if (!resendResult && sendError) {
+      console.error('[EmailService] Outbound email send failed:', sendError);
+      throw sendError;
     }
 
     // Persist locally

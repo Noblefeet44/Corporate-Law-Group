@@ -13,6 +13,7 @@ export default async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL || 'https://xsnfafxcbdkyinytjhci.supabase.co';
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const resendApiKey = process.env.RESEND_API_KEY;
 
     if (!supabaseServiceKey) {
       console.error('SUPABASE_SERVICE_ROLE_KEY environment variable is missing.');
@@ -20,7 +21,24 @@ export default async function handler(req, res) {
     }
 
     const payload = req.body || {};
-    const emailData = payload.data || payload;
+    let emailData = payload.data || payload;
+    const emailId = emailData.email_id || emailData.id;
+
+    // Resend email.received webhook sends metadata only.
+    // Fetch full email content (HTML, text, headers) from Resend if API key is present.
+    if (emailId && resendApiKey && (!emailData.html && !emailData.text)) {
+      try {
+        const fullRes = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
+          headers: { 'Authorization': `Bearer ${resendApiKey}` }
+        });
+        if (fullRes.ok) {
+          const fullEmail = await fullRes.json();
+          emailData = { ...emailData, ...fullEmail };
+        }
+      } catch (fetchErr) {
+        console.warn('Could not fetch full email content from Resend API:', fetchErr);
+      }
+    }
 
     // Normalize sender info
     const fromRaw = emailData.from || '';
@@ -51,7 +69,7 @@ export default async function handler(req, res) {
     // Insert record directly into Supabase via REST API
     const insertPayload = [
       {
-        message_id: emailData.email_id || emailData.id || `resend-${Date.now()}`,
+        message_id: emailId || `resend-${Date.now()}`,
         from_address: fromAddress,
         from_name: fromName || fromAddress,
         to_address: toAddresses,
@@ -66,7 +84,7 @@ export default async function handler(req, res) {
         attachments: attachments,
         labels: ['Inbox'],
         raw_headers: emailData.headers || {},
-        created_at: new Date().toISOString()
+        created_at: emailData.created_at || new Date().toISOString()
       }
     ];
 
