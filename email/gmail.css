@@ -1576,4 +1576,363 @@ body {
   background: #f1f5f9;
 }
 
+/* ==============================================================================
+   14. Executive Portal Password Security Gate (/email Protection)
+   ============================================================================== */
+html.portal-locked body > *:not(#portalLockOverlay) {
+  display: none !important;
+}
+
+html.portal-locked #portalLockOverlay {
+  display: flex !important;
+}
+
+.portal-lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: radial-gradient(circle at 50% 25%, #0d274d 0%, #0a192f 60%, #060e1a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  animation: fadeInLock 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInLock {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.portal-lock-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(13, 27, 49, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(194, 161, 118, 0.35);
+  border-radius: 20px;
+  padding: 40px 32px 32px;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(11, 87, 208, 0.15);
+  color: #ffffff;
+  position: relative;
+}
+
+.portal-lock-crest {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 20px;
+}
+
+.lock-crest-monogram {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0b57d0 0%, #083478 100%);
+  border: 2px solid rgba(194, 161, 118, 0.6);
+  color: #ffffff;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(11, 87, 208, 0.4);
+}
+
+.lock-crest-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 28px;
+  height: 28px;
+  background: #c2a176;
+  border-radius: 50%;
+  color: #0a192f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #0a192f;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.portal-lock-title {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 6px;
+}
+
+.portal-lock-subtitle {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0 0 14px;
+  font-weight: 500;
+}
+
+.portal-lock-badge {
+  display: inline-block;
+  background: rgba(194, 161, 118, 0.15);
+  color: #e2c49b;
+  border: 1px solid rgba(194, 161, 118, 0.35);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 28px;
+}
+
+.portal-lock-form {
+  text-align: left;
+}
+
+.portal-lock-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+.lock-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1.5px solid rgba(194, 161, 118, 0.3);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.lock-input-group:focus-within {
+  border-color: #c2a176;
+  box-shadow: 0 0 0 3px rgba(194, 161, 118, 0.2);
+}
+
+.lock-input-icon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.portal-lock-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 15px;
+  padding: 14px 44px 14px 42px;
+  font-family: var(--font-base);
+}
+
+.portal-lock-input::placeholder {
+  color: #64748b;
+  font-size: 13.5px;
+}
+
+.lock-toggle-pwd {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.lock-toggle-pwd:hover {
+  color: #ffffff;
+}
+
+.portal-lock-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(220, 38, 38, 0.15);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  color: #fca5a5;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-top: 12px;
+  animation: shakeError 0.4s ease;
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.portal-lock-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #c2a176 0%, #a68357 100%);
+  color: #0a192f;
+  border: none;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(194, 161, 118, 0.3);
+}
+
+.portal-lock-btn:hover {
+  background: linear-gradient(135deg, #d3b388 0%, #b89263 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(194, 161, 118, 0.4);
+}
+
+.portal-lock-btn:active {
+  transform: translateY(0);
+}
+
+.portal-lock-footer {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.portal-back-home {
+  font-size: 12.5px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.portal-back-home:hover {
+  color: #c2a176;
+}
+
+.portal-lock-notice {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+/* Header Lock Portal Button */
+.lock-portal-btn {
+  color: #444746;
+  transition: all 0.2s ease;
+}
+
+.lock-portal-btn:hover {
+  color: #c2a176;
+  background-color: rgba(194, 161, 118, 0.12);
+}
+
+/* ==============================================================================
+   15. Compose Window Branded Attorney Signature Preview
+   ============================================================================== */
+.compose-signature-notice {
+  padding: 10px 16px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sig-notice-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.compose-sig-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #0b57d0;
+  flex-shrink: 0;
+}
+
+.compose-sig-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.compose-sig-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sig-pill {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(11, 87, 208, 0.1);
+  color: #0b57d0;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.sig-office {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.compose-sig-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.compose-sig-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.compose-sig-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #c2a176;
+}
+
+.compose-sig-practice {
+  font-size: 11px;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 
