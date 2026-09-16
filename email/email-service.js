@@ -431,7 +431,31 @@ class EmailService {
     };
 
     let resendResult = null;
-    if (this.config.resendApiKey) {
+    // 1. Try Vercel serverless function /api/send-email first (uses RESEND_API_KEY from Vercel)
+    try {
+      const vResponse = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: `${finalName} <${finalEmail}>`,
+          to: to,
+          cc: cc || undefined,
+          bcc: bcc || undefined,
+          subject: subject || '(no subject)',
+          html: bodyHtml || bodyText,
+          text: bodyText || undefined
+        })
+      });
+      if (vResponse.ok) {
+        resendResult = await vResponse.json();
+        newEmail.message_id = resendResult.id;
+      }
+    } catch (apiErr) {
+      // Vercel function not reachable (e.g. local vite dev without API server)
+    }
+
+    // 2. Fallback to direct client-side Resend API if API key is provided locally
+    if (!resendResult && this.config.resendApiKey) {
       try {
         const response = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -453,7 +477,7 @@ class EmailService {
           newEmail.message_id = resendResult.id;
         }
       } catch (err) {
-        console.warn('[Resend API] Fetch error:', err);
+        console.warn('[Resend API] Direct fetch error:', err);
       }
     }
 
