@@ -971,4 +971,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       return escapeHtml(rawHtml);
     }
   }
+
+  // Hamburger Menu Toggle for Webmail Sidebar
+  const sidebarToggleBtn = document.getElementById('gmailSidebarToggle');
+  const appContainer = document.querySelector('.app-container');
+  const sidebar = document.querySelector('.gmail-sidebar');
+
+  if (sidebarToggleBtn && appContainer) {
+    sidebarToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      appContainer.classList.toggle('sidebar-collapsed');
+      if (sidebar) {
+        sidebar.classList.toggle('mobile-hidden');
+      }
+    });
+  }
 });

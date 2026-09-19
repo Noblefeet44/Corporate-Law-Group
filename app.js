@@ -870,9 +870,13 @@ function initContactForm() {
    ========================================================================== */
 function initNavigation() {
   const header = document.querySelector('.site-header');
-  const toggleBtn = document.querySelector('.mobile-toggle');
-  const menu = document.querySelector('.nav-menu');
-  const navLinks = document.querySelectorAll('.nav-link');
+  const toggleBtn = document.getElementById('mobileToggleBtn') || document.querySelector('.mobile-toggle');
+  const drawerCloseBtn = document.getElementById('mobileDrawerClose');
+  const backdrop = document.getElementById('mobileMenuBackdrop');
+  const menu = document.getElementById('primaryNav') || document.querySelector('.nav-menu');
+  const interactiveItems = document.querySelectorAll(
+    '.nav-menu .nav-link, .nav-menu .drawer-portal-pill, .nav-menu .mobile-practice-chip, .nav-menu .trigger-consult-modal, .nav-menu .drawer-info-link'
+  );
 
   // Header background on scroll
   window.addEventListener('scroll', () => {
@@ -881,18 +885,72 @@ function initNavigation() {
     } else {
       header.classList.remove('scrolled');
     }
-  });
+  }, { passive: true });
+
+  function openMobileMenu() {
+    if (!menu) return;
+    menu.classList.add('open');
+    if (toggleBtn) {
+      toggleBtn.classList.add('active');
+      toggleBtn.setAttribute('aria-expanded', 'true');
+    }
+    if (backdrop) backdrop.classList.add('active');
+    document.body.classList.add('mobile-menu-open');
+  }
+
+  function closeMobileMenu() {
+    if (!menu) return;
+    menu.classList.remove('open');
+    if (toggleBtn) {
+      toggleBtn.classList.remove('active');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.classList.remove('mobile-menu-open');
+  }
 
   // Mobile menu toggle
   if (toggleBtn && menu) {
-    toggleBtn.addEventListener('click', () => {
-      menu.classList.toggle('open');
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (menu.classList.contains('open')) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
     });
 
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        menu.classList.remove('open');
+    if (drawerCloseBtn) {
+      drawerCloseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeMobileMenu();
+      });
+    }
+
+    if (backdrop) {
+      backdrop.addEventListener('click', closeMobileMenu);
+    }
+
+    // Close when clicking any interactive item inside the drawer
+    interactiveItems.forEach(item => {
+      item.addEventListener('click', () => {
+        closeMobileMenu();
       });
     });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.classList.contains('open')) {
+        closeMobileMenu();
+      }
+    });
+
+    // Close on window resize above mobile breakpoint
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 992 && menu.classList.contains('open')) {
+        closeMobileMenu();
+      }
+    }, { passive: true });
   }
 }
+

@@ -41,7 +41,6 @@
         "url": "https://corporatelawgroup.org",
         "logo": "https://corporatelawgroup.org/assets/logo.png",
         "description": "Strategic legal counsel for businesses, entrepreneurs, financial institutions, and investors across Banking & Finance, Tax Law, and Corporate & Business Law.",
-        "telephone": "+1-800-592-2529",
         "email": "inquiries@corporatelawgroup.org",
         "priceRange": "$$$$",
         "address": {
@@ -156,7 +155,7 @@
             "name": "How do I schedule a consultation?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "You can schedule a consultation online by clicking 'Schedule a Consultation' on our website, completing our confidential matter intake form, or by calling our office directly at +1 (800) 592-2529."
+              "text": "You can schedule a consultation online by clicking 'Schedule a Consultation' on our website, or by completing our confidential matter intake form."
             }
           }
         ]
@@ -175,11 +174,11 @@
         <span class="top-bar-link">Houston • Dallas • Austin • San Antonio • Fort Worth</span>
       </div>
       <div class="top-bar-right">
-        <a href="tel:+18005922529" class="top-bar-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-          Direct: (800) 592-CLAW / (713) 555-0190
+        <a href="mailto:inquiries@corporatelawgroup.org" class="top-bar-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          inquiries@corporatelawgroup.org
         </a>
-        <a href="#contact" class="top-bar-link">Client Intake</a>
+        <a href="#contact" class="top-bar-link trigger-consult-modal">Client Intake</a>
       </div>
     </div>
   </div>
@@ -195,30 +194,146 @@
         </div>
       </a>
 
-      <nav class="nav-menu" aria-label="Primary Navigation">
-        <a href="#about" class="nav-link">About</a>
-        <a href="#practice-areas" class="nav-link">Practice Areas</a>
-        <a href="#why-us" class="nav-link">Why Us</a>
-        <a href="#attorneys" class="nav-link">Attorneys</a>
-        <a href="#insights" class="nav-link">Insights</a>
-        <a href="#locations" class="nav-link">Locations</a>
-        <a href="#faq" class="nav-link">FAQ</a>
-        <a href="#contact" class="nav-link">Contact</a>
+      <!-- Primary & Mobile Navigation Menu -->
+      <nav class="nav-menu" id="primaryNav" aria-label="Primary Navigation">
+        <!-- Mobile Drawer Header (shown only on mobile) -->
+        <div class="mobile-drawer-header">
+          <div class="mobile-drawer-brand">
+            <span class="logo-monogram sm">CLG</span>
+            <div class="mobile-brand-copy">
+              <span class="mobile-drawer-title">Corporate Law Group</span>
+              <span class="mobile-drawer-sub">Texas &amp; Nationwide Counsel</span>
+            </div>
+          </div>
+          <button class="mobile-drawer-close" id="mobileDrawerClose" aria-label="Close menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        <!-- Mobile Top CTA Actions (prominent consultation trigger) -->
+        <div class="mobile-drawer-ctas">
+          <button class="btn btn-gold btn-sm trigger-consult-modal mobile-cta-btn" id="mobileDrawerConsultBtn">
+            <span>Schedule a Consultation</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="nav-links-wrap">
+          <a href="#about" class="nav-link">
+            <span>About</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+          <a href="#practice-areas" class="nav-link">
+            <span>Practice Areas</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+
+          <!-- Mobile Practice Area Quick Links -->
+          <div class="mobile-practice-chips">
+            <button class="mobile-practice-chip trigger-practice-modal" data-area="corporate">
+              <span>Corporate &amp; M&amp;A</span>
+            </button>
+            <button class="mobile-practice-chip trigger-practice-modal" data-area="banking">
+              <span>Banking &amp; Finance</span>
+            </button>
+            <button class="mobile-practice-chip trigger-practice-modal" data-area="tax">
+              <span>Tax Law</span>
+            </button>
+          </div>
+
+          <a href="#why-us" class="nav-link">
+            <span>Why Us</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+          <a href="#who-we-serve" class="nav-link mobile-only-link">
+            <span>Who We Serve</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+          <a href="#how-we-help" class="nav-link mobile-only-link">
+            <span>How We Help</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+          <a href="#attorneys" class="nav-link">
+            <span>Attorneys</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+          <a href="#insights" class="nav-link">
+            <span>Insights</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+          <a href="#locations" class="nav-link">
+            <span>Locations</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+          <a href="#faq" class="nav-link">
+            <span>FAQ</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+          <a href="#contact" class="nav-link">
+            <span>Contact</span>
+            <svg class="mobile-nav-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+        </div>
+
+        <!-- Mobile Drawer Practice Details & Contact Info -->
+        <div class="mobile-drawer-footer">
+          <div class="mobile-drawer-section">
+            <span class="drawer-sec-label">Direct Contact</span>
+            <a href="mailto:inquiries@corporatelawgroup.org" class="drawer-info-link">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>inquiries@corporatelawgroup.org</span>
+            </a>
+            <div class="drawer-info-row">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Mon – Fri: 8:00 AM – 6:30 PM CST</span>
+            </div>
+            <div class="drawer-info-row">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>1000 Louisiana St, Ste 4800, Houston, TX 77002</span>
+            </div>
+          </div>
+
+          <div class="mobile-drawer-section">
+            <span class="drawer-sec-label">Client Services</span>
+            <div class="drawer-portal-links">
+              <a href="#contact" class="drawer-portal-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Client Intake</span>
+              </a>
+              <a href="email/" class="drawer-portal-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                <span>Webmail Portal</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="mobile-drawer-badge">
+            <span class="top-badge-state">Texas &amp; Federal Jurisdiction</span>
+            <span class="drawer-cities">Houston • Dallas • Austin • San Antonio • Fort Worth</span>
+          </div>
+        </div>
       </nav>
 
       <div class="header-actions">
+        <!-- Schedule Consultation button -->
         <button class="btn btn-primary btn-sm trigger-consult-modal" id="headerConsultBtn">
           <span>Schedule Consultation</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </button>
-        <button class="mobile-toggle" aria-label="Toggle mobile menu">
-          <span></span>
-          <span></span>
-          <span></span>
+
+        <!-- Mobile Hamburger Toggle -->
+        <button class="mobile-toggle" id="mobileToggleBtn" aria-label="Toggle mobile menu" aria-expanded="false">
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
         </button>
       </div>
     </div>
   </header>
+
+  <!-- Mobile Backdrop Overlay -->
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" aria-hidden="true"></div>
 
   <main id="main-content">
 
@@ -1087,7 +1202,7 @@
             </button>
             <div class="faq-answer">
               <div class="faq-answer-inner">
-                Scheduling is straightforward: click <a href="#" class="trigger-consult-modal">Schedule a Consultation</a> anywhere on this site to access our confidential intake portal, complete our in-page contact form below, or call our direct phone line at <strong>+1 (800) 592-2529</strong>.
+                Scheduling is straightforward: click <a href="#" class="trigger-consult-modal">Schedule a Consultation</a> anywhere on this site to access our confidential intake portal, complete our in-page contact form below, or reach our team directly at <a href="mailto:inquiries@corporatelawgroup.org"><strong>inquiries@corporatelawgroup.org</strong></a>.
               </div>
             </div>
           </div>
@@ -1159,7 +1274,7 @@
                   <div><strong>Offices:</strong> Houston &amp; Dallas Hubs</div>
                   <div><strong>Consultation:</strong> In-Person &amp; Video Conference</div>
                 </div>
-                <a href="tel:+18005922529" class="btn btn-outline-light btn-sm">Call Texas Office</a>
+                <button class="btn btn-outline-light btn-sm trigger-consult-modal">Schedule Texas Counsel</button>
               </div>
             </div>
           </div>
@@ -1200,10 +1315,10 @@
                 <div class="loc-details-list">
                   <div><strong>Address:</strong> 1000 Louisiana St, Suite 4800</div>
                   <div><strong>Jurisdiction:</strong> S.D. Texas, Harris County District Courts</div>
-                  <div><strong>Phone:</strong> (713) 555-0190</div>
+                  <div><strong>Email:</strong> houston@mail.corporatelawgroup.org</div>
                   <div><strong>Hours:</strong> Mon – Fri: 8:00 AM – 6:30 PM</div>
                 </div>
-                <a href="tel:+17135550190" class="btn btn-outline-light btn-sm">Direct Houston Line</a>
+                <button class="btn btn-outline-light btn-sm trigger-consult-modal" data-practice="Corporate &amp; Business Law">Connect With Houston</button>
               </div>
             </div>
           </div>
@@ -1244,10 +1359,10 @@
                 <div class="loc-details-list">
                   <div><strong>Address:</strong> 2000 McKinney Ave, Suite 1900</div>
                   <div><strong>Jurisdiction:</strong> N.D. Texas, Dallas County Courts</div>
-                  <div><strong>Phone:</strong> (214) 555-0144</div>
+                  <div><strong>Email:</strong> dallas@mail.corporatelawgroup.org</div>
                   <div><strong>Hours:</strong> Mon – Fri: 8:00 AM – 6:30 PM</div>
                 </div>
-                <a href="tel:+12145550144" class="btn btn-outline-light btn-sm">Direct Dallas Line</a>
+                <button class="btn btn-outline-light btn-sm trigger-consult-modal" data-practice="Tax Law">Connect With Dallas</button>
               </div>
             </div>
           </div>
@@ -1288,10 +1403,10 @@
                 <div class="loc-details-list">
                   <div><strong>Address:</strong> 300 Colorado St, Suite 2100</div>
                   <div><strong>Jurisdiction:</strong> W.D. Texas, Travis County Courts</div>
-                  <div><strong>Phone:</strong> (512) 555-0177</div>
+                  <div><strong>Email:</strong> austin@mail.corporatelawgroup.org</div>
                   <div><strong>Hours:</strong> Mon – Fri: 8:00 AM – 6:30 PM</div>
                 </div>
-                <a href="tel:+15125550177" class="btn btn-outline-light btn-sm">Direct Austin Line</a>
+                <button class="btn btn-outline-light btn-sm trigger-consult-modal" data-practice="Banking &amp; Finance">Connect With Austin</button>
               </div>
             </div>
           </div>
@@ -1332,10 +1447,10 @@
                 <div class="loc-details-list">
                   <div><strong>Address:</strong> 112 E Pecan St, Suite 1400</div>
                   <div><strong>Jurisdiction:</strong> W.D. Texas, Bexar County District Courts</div>
-                  <div><strong>Phone:</strong> (210) 555-0182</div>
+                  <div><strong>Email:</strong> sanantonio@mail.corporatelawgroup.org</div>
                   <div><strong>Hours:</strong> Mon – Fri: 8:00 AM – 6:30 PM</div>
                 </div>
-                <a href="tel:+12105550182" class="btn btn-outline-light btn-sm">Direct San Antonio Line</a>
+                <button class="btn btn-outline-light btn-sm trigger-consult-modal">Connect With San Antonio</button>
               </div>
             </div>
           </div>
@@ -1376,10 +1491,10 @@
                 <div class="loc-details-list">
                   <div><strong>Address:</strong> 777 Main St, Suite 2400</div>
                   <div><strong>Jurisdiction:</strong> N.D. Texas, Tarrant County Courts</div>
-                  <div><strong>Phone:</strong> (817) 555-0193</div>
+                  <div><strong>Email:</strong> fortworth@mail.corporatelawgroup.org</div>
                   <div><strong>Hours:</strong> Mon – Fri: 8:00 AM – 6:30 PM</div>
                 </div>
-                <a href="tel:+18175550193" class="btn btn-outline-light btn-sm">Direct Fort Worth Line</a>
+                <button class="btn btn-outline-light btn-sm trigger-consult-modal">Connect With Fort Worth</button>
               </div>
             </div>
           </div>
@@ -1404,11 +1519,11 @@
             <div class="contact-direct-items">
               <div class="direct-item">
                 <div class="direct-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 </div>
                 <div class="direct-content">
-                  <h4>Telephone Inquiries</h4>
-                  <p><a href="tel:+18005922529">(800) 592-CLAW</a> &bull; <a href="tel:+17135550190">(713) 555-0190</a></p>
+                  <h4>Online Consultation</h4>
+                  <p><a href="#" class="trigger-consult-modal">Schedule Confidential Intake &rarr;</a></p>
                 </div>
               </div>
 
@@ -1800,7 +1915,7 @@
           <div>
             <img id="modalAttorneyImg" src="" alt="" class="modal-attorney-img">
             <div style="margin-top: 16px; background: var(--bg-secondary); padding: 14px; border-radius: var(--radius-sm); font-size: 0.82rem; border: 1px solid var(--border-subtle);">
-              <div style="margin-bottom: 6px;"><strong>Direct Office:</strong> (800) 592-CLAW</div>
+              <div style="margin-bottom: 6px;"><strong>Direct Intake:</strong> inquiries@corporatelawgroup.org</div>
               <div><strong>Email:</strong> counsel@corporatelawgroup.org</div>
             </div>
             <button class="btn btn-gold btn-sm trigger-consult-modal" style="width: 100%; margin-top: 14px;" onclick="closeAttorneyModal()">

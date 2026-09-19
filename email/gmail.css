@@ -274,6 +274,43 @@ body {
   padding: 8px 12px 16px 16px;
   overflow-y: auto;
   user-select: none;
+  transition: width 0.2s ease, padding 0.2s ease;
+}
+
+/* Collapsed Mini-Sidebar State */
+.app-container.sidebar-collapsed .gmail-sidebar {
+  width: 72px;
+  padding: 8px 8px 16px 8px;
+}
+
+.app-container.sidebar-collapsed .compose-btn span,
+.app-container.sidebar-collapsed .nav-folder-item span,
+.app-container.sidebar-collapsed .folder-count-badge,
+.app-container.sidebar-collapsed .sidebar-section-title,
+.app-container.sidebar-collapsed .partner-filter-list,
+.app-container.sidebar-collapsed .labels-header,
+.app-container.sidebar-collapsed .labels-tree {
+  display: none !important;
+}
+
+.app-container.sidebar-collapsed .compose-btn {
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  border-radius: 16px;
+  margin: 0 auto;
+}
+
+.app-container.sidebar-collapsed .nav-folder-item {
+  justify-content: center;
+  padding: 0;
+  height: 44px;
+  border-radius: 22px;
+}
+
+.app-container.sidebar-collapsed .nav-item-left {
+  justify-content: center;
 }
 
 .compose-btn-wrap {
@@ -1575,5 +1612,158 @@ body {
 .btn-dossier-secondary:hover {
   background: #f1f5f9;
 }
+
+/* ==========================================================================
+   Mobile & Responsive Webmail Layout
+   ========================================================================== */
+@media (max-width: 900px) {
+  .header-search-wrap {
+    max-width: 380px;
+  }
+
+  .identity-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .gmail-header {
+    padding: 8px 12px;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .header-left {
+    width: auto;
+  }
+
+  .project-brand-info {
+    display: none;
+  }
+
+  .header-search-wrap {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .header-right {
+    margin-left: auto;
+    gap: 8px;
+  }
+
+  .status-badge {
+    display: none;
+  }
+
+  .app-container {
+    flex-direction: column;
+    height: calc(100vh - 105px);
+  }
+
+  .gmail-sidebar {
+    width: 100%;
+    height: auto;
+    padding: 8px 12px;
+    border-right: none;
+    border-bottom: 1px solid var(--gmail-border-subtle);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .compose-btn-wrap {
+    margin: 0;
+  }
+
+  .compose-btn {
+    padding: 0 16px;
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .nav-folder-list {
+    display: flex;
+    margin: 0;
+    gap: 4px;
+  }
+
+  .nav-folder-item {
+    border-radius: 20px;
+    padding: 0 12px;
+    height: 36px;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .sidebar-section-title,
+  .partner-filter-list {
+    display: none;
+  }
+
+  /* Email row adjustments on mobile */
+  .email-row {
+    height: auto;
+    min-height: 60px;
+    padding: 10px 12px;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .row-lead-actions {
+    width: auto;
+    gap: 8px;
+  }
+
+  .row-sender {
+    width: auto;
+    flex: 1;
+    font-size: 13.5px;
+  }
+
+  .row-time {
+    width: auto;
+    font-size: 11px;
+    margin-left: auto;
+  }
+
+  .row-content-wrap {
+    width: 100%;
+    padding-left: 28px;
+    font-size: 12.5px;
+  }
+
+  /* Modal Composer on Mobile */
+  .compose-window {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    z-index: 2000 !important;
+  }
+
+  .compose-body-textarea {
+    min-height: 250px;
+  }
+
+  /* Right Dock / Dossier Panel */
+  .dossier-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 320px;
+    max-width: 90vw;
+    z-index: 1500;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  }
+}
+
 
 
